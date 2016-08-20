@@ -63,9 +63,11 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			if content.ContentType == linebot.ContentTypeText{ // content type : text
 				text, _ := content.TextContent()
 				if text.Text == "手" {
-					t1, t2 := DB.GetTwoCards(content.From)
-					s1 := GetCardName(t1)
-					s2 := GetCardName(t2)
+					carr1 := DB.GetTwoCards(content.From)
+					t1 := carr1[0]
+					t2 := carr1[1]
+					s1 := DB.GetCardName(t1)
+					s2 := DB.GetCardName(t2)
 					bot.SendText([]string{content.From}, s1 + "\n" + s2)
 				}
 				//bot.SendText([]string{os.Getenv("mymid")}, info[0].DisplayName+" :\n"+text.Text) // sent to tester
