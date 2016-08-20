@@ -43,7 +43,6 @@ func GetTwoCards(MID string) [2]int{
 		//db.QueryRow("名字 FROM GameAction, 撲克牌參照表 WHERE MID = ? and PlayerCard2 = 編號", MID ).Scan(&card2name)
 		cards = [2]int{card1, card2}
 	}else{
-		db.QueryRow("SELECT PlayerX FROM sql6131889.GameAction WHERE MID = ? and Cancel = 0", MID ).Scan(&PlayerX)
 		pointer := PlayerX * 2
 		db.QueryRow("SELECT 洗過的牌庫.編號 FROM sql6131889.洗過的牌庫 WHERE 洗過的牌庫.編號 = ? ", (pointer -1) ).Scan(&card1)
 		db.QueryRow("SELECT 洗過的牌庫.編號 FROM sql6131889.洗過的牌庫 WHERE 洗過的牌庫.編號 = ? ", pointer ).Scan(&card2)
