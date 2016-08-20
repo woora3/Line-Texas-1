@@ -62,6 +62,12 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			if content.ContentType == linebot.ContentTypeText{ // content type : text
 				text, _ := content.TextContent()
+				if text.Text == "手" {
+					t1, t2 := DB.GetTwoCards(content.From)
+					s1 := GetCardName(t1)
+					s2 := GetCardName(t2)
+					bot.SendText([]string{content.From}, s1 + "\n" + s2)
+				}
 				//bot.SendText([]string{os.Getenv("mymid")}, info[0].DisplayName+" :\n"+text.Text) // sent to tester
 				db.Exec("INSERT INTO sql6131889.text (MID, Text)VALUES (?, ?)", info[0].MID, text.Text)
 				var S int
