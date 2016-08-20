@@ -55,8 +55,6 @@ func GetTwoCards(MID string) [2]int{
 
 ////拿新的兩張手牌
 func NewTwoCards(MID string) [2]int{
-	var GameID int
-	GameID = 0;
 	var card1 int
 	var card2 int
 	var PlayerX int	
