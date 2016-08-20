@@ -31,19 +31,22 @@ func UserGamming(MID string) bool{
 func GetTwoCards(MID string) [2]int{
 	var GameID int
 	GameID = 0;
+	var PlayerX int
 	var card1 int
 	var card2 int
 	cards := [2]int{-1, -1}
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
-	db.QueryRow("SELECT GameID, PlayerCard1, PlayerCard2 FROM sql6131889.GameAction WHERE MID = ? and Cancel = 0", MID ).Scan(&GameID, &card1, &card2)
+	db.QueryRow("SELECT GameID, PlayerX, PlayerCard1, PlayerCard2 FROM sql6131889.GameAction WHERE MID = ? and Cancel = 0", MID ).Scan(&GameID, &PlayerX, &card1, &card2)
+
 	if card1 != 0{
 		//db.QueryRow("名字 FROM GameAction, 撲克牌參照表 WHERE MID = ? and PlayerCard1 = 編號", MID ).Scan(&card1name)
 		//db.QueryRow("名字 FROM GameAction, 撲克牌參照表 WHERE MID = ? and PlayerCard2 = 編號", MID ).Scan(&card2name)
 		cards = [2]int{card1, card2}
 	}else{
-		rand.Seed(time.Now().UTC().UnixNano())
-		card1 = 1 + rand.Intn(52)
-		card2 = 1 + rand.Intn(52)
+		db.QueryRow("SELECT PlayerX FROM sql6131889.GameAction WHERE MID = ? and Cancel = 0", MID ).Scan(&PlayerX)
+		pointer := PlayerX * 2
+		db.QueryRow("SELECT 洗過的牌庫.編號 FROM sql6131889.洗過的牌庫 WHERE 洗過的牌庫.編號 = ? ", (pointer -1) ).Scan(&card1)
+		db.QueryRow("SELECT 洗過的牌庫.編號 FROM sql6131889.洗過的牌庫 WHERE 洗過的牌庫.編號 = ? ", pointer ).Scan(&card2)
 		cards = [2]int{card1, card2}
 		db.Exec("UPDATE sql6131889.GameAction SET PlayerCard1 = ? , PlayerCard2 = ? WHERE MID = ? AND Cancel = ?", card1, card2, MID, 0) 
 	}
@@ -56,12 +59,14 @@ func NewTwoCards(MID string) [2]int{
 	GameID = 0;
 	var card1 int
 	var card2 int
+	var PlayerX int	
 	cards := [2]int{-1, -1}
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 	//db.QueryRow("SELECT GameID, PlayerCard1, PlayerCard2 FROM sql6131889.GameAction WHERE MID = ? and Cancel = 0", MID ).Scan(&GameID, &card1, &card2)
-	rand.Seed(time.Now().UTC().UnixNano())
-	card1 = 1 + rand.Intn(52)
-	card2 = 1 + rand.Intn(52)
+	db.QueryRow("SELECT PlayerX FROM sql6131889.GameAction WHERE MID = ? and Cancel = 0", MID ).Scan(&PlayerX)
+	pointer := PlayerX * 2
+	db.QueryRow("SELECT 洗過的牌庫.編號 FROM sql6131889.洗過的牌庫 WHERE 洗過的牌庫.編號 = ? ", (pointer -1) ).Scan(&card1)
+	db.QueryRow("SELECT 洗過的牌庫.編號 FROM sql6131889.洗過的牌庫 WHERE 洗過的牌庫.編號 = ? ", pointer ).Scan(&card2)
 	db.Exec("UPDATE sql6131889.GameAction SET PlayerCard1 = ?, PlayerCard2 = ?  WHERE MID = ?", card1, card2, MID)
 	cards = [2]int{card1, card2}
 	return cards
